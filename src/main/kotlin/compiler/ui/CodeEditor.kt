@@ -12,11 +12,6 @@ import java.awt.event.InputEvent
 
 class CodeEditor : JFrame("Compilador") {
 
-    private val editor = JTextArea().apply { border = NumberedBorder() }
-    private val console = JTextArea().apply { isEditable = false; background = Color.BLACK; foreground = Color.WHITE }
-    private val messageArea = JLabel()
-
-    private val clipboard = Toolkit.getDefaultToolkit().systemClipboard
     private val undoManager = UndoManager()
     private val editor = JTextArea().apply {
         val undoAction = object : AbstractAction("Undo") {
