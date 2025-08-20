@@ -68,14 +68,14 @@ class Toolbar(
         add(createButton(
             "Compilar [F7]",
             "/icons/compile.png",
-            KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0), // sem Ctrl
+            KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0),
             ::compile
         ))
 
         add(createButton(
             "Equipe [F1]",
             "/icons/team.png",
-            KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0), // sem Ctrl
+            KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
             ::showTeam
         ))
 
@@ -92,27 +92,26 @@ class Toolbar(
         shortCut: KeyStroke,
         onClick: () -> Unit
     ): JButton {
-        val btn = JButton(text)
-        btn.toolTipText = text
-        btn.icon = loadIcon(iconPath)
+        return JButton(text).apply {
+            toolTipText = text
+            icon = loadIcon(iconPath)
 
-        btn.verticalTextPosition = SwingConstants.BOTTOM
-        btn.horizontalTextPosition = SwingConstants.CENTER
+            verticalTextPosition = BOTTOM
+            horizontalTextPosition = CENTER
 
-        btn.preferredSize = Dimension(100, 70)
-        btn.minimumSize = Dimension(100, 70)
-        btn.maximumSize = Dimension(100, 70)
+            preferredSize = Dimension(120, 70)
+            minimumSize = Dimension(120, 70)
+            maximumSize = Dimension(120, 70)
 
-        btn.addActionListener { onClick() }
+            addActionListener { onClick() }
 
-        btn.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(shortCut, text)
-        btn.actionMap.put(text, object : AbstractAction() {
-            override fun actionPerformed(e: ActionEvent?) {
-                onClick()
-            }
-        })
-
-        return btn
+            getInputMap(WHEN_IN_FOCUSED_WINDOW).put(shortCut, text)
+            actionMap.put(text, object : AbstractAction() {
+                override fun actionPerformed(e: ActionEvent?) {
+                    onClick()
+                }
+            })
+        }
     }
 
     private fun loadIcon(path: String): ImageIcon {
@@ -123,7 +122,6 @@ class Toolbar(
         val scaled: Image = original.getScaledInstance(32, 32, Image.SCALE_SMOOTH)
         return ImageIcon(scaled)
     }
-
 
     private fun newFile() {
         editor.text = ""

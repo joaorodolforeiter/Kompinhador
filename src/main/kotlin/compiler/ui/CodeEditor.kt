@@ -1,14 +1,11 @@
 package compiler.ui
 
 import java.awt.*
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import javax.swing.*
 import javax.swing.undo.UndoManager
 import java.awt.event.InputEvent
-
 
 class CodeEditor : JFrame("Compilador") {
 
