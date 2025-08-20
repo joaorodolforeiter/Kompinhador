@@ -1,14 +1,44 @@
 package compiler.ui
 
 import java.awt.*
+import java.awt.datatransfer.DataFlavor
+import java.awt.datatransfer.StringSelection
+import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import javax.swing.*
+import javax.swing.undo.UndoManager
+import java.awt.event.InputEvent
+
 
 class CodeEditor : JFrame("Compilador") {
 
     private val editor = JTextArea().apply { border = NumberedBorder() }
     private val console = JTextArea().apply { isEditable = false; background = Color.BLACK; foreground = Color.WHITE }
     private val messageArea = JLabel()
+
+    private val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+    private val undoManager = UndoManager()
+    private val editor = JTextArea().apply {
+        val undoAction = object : AbstractAction("Undo") {
+            override fun actionPerformed(e: ActionEvent?) {
+                if (undoManager.canUndo()) {
+                    undoManager.undo()
+                }
+            }
+        }
+        border = NumberedBorder()
+        document.addUndoableEditListener {
+            undoManager.addEdit(it.edit)
+        }
+
+        var map = getInputMap(JComponent.WHEN_FOCUSED)
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction")
+        actionMap.put("undoAction", undoAction)
+    }
+    private val console = JTextArea().apply { isEditable = false; background = Color.BLACK; foreground = Color.WHITE }
+    private val messageArea = JLabel().apply {
+        preferredSize = this@CodeEditor.width by 25
+    }
 
     init {
         size = 1500 by 800
