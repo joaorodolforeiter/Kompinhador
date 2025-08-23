@@ -159,7 +159,6 @@ class Toolbar(
             when (fileChooser.showSaveDialog(this@Toolbar)) {
                 JFileChooser.APPROVE_OPTION -> {
                     file = fileChooser.selectedFile
-                    fileModificationDate = fileChooser.selectedFile.lastModified()
                     messageArea.text = "Arquivo salvo em: ${file?.absolutePath}"
                 }
 
@@ -172,8 +171,10 @@ class Toolbar(
                 }
             }
         }
-
-        file?.writeText(editor.text)
+        synchronized(this) {
+            file?.writeText(editor.text)
+            fileModificationDate = file?.lastModified() ?: 0
+        }
     }
 
     private fun copy() {
@@ -202,10 +203,17 @@ class Toolbar(
 
     private fun listenForFileModifications() {
         while (true) {
-            val lastModified = file?.lastModified() ?: 0
+            var lastModified: Long
+            synchronized(this) {
+                lastModified = file?.lastModified() ?: 0
+            }
+
             if (lastModified > fileModificationDate) {
-                fileModificationDate = lastModified
-                editor.text = file?.readText()
+                val option = JOptionPane.showConfirmDialog(editor, "O arquivo foi sobrescrito por outra aplicação. Deseja carregar as alterações?")
+                if (option == JOptionPane.YES_OPTION) {
+                    editor.text = file?.readText()
+                }
+                fileModificationDate = file?.lastModified() ?: 0
             }
             Thread.sleep(100)
         }
