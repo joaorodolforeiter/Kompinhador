@@ -9,6 +9,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
 import java.io.File
+import kotlin.concurrent.thread
 
 class Toolbar(
     private val editor: JTextArea,
@@ -17,6 +18,7 @@ class Toolbar(
 ) : JToolBar("Toolbar") {
 
     private var file: File? = null
+    private var fileModificationDate: Long = 0
     private val clipboard = Toolkit.getDefaultToolkit().systemClipboard
     private val fileChooser = JFileChooser().apply { dialogTitle = "Selecione um arquivo" }
 
@@ -79,6 +81,7 @@ class Toolbar(
             ::showTeam
         ))
 
+        thread { listenForFileModifications() }
     }
 
     override fun getPreferredSize(): Dimension {
@@ -128,6 +131,7 @@ class Toolbar(
         console.text = ""
         messageArea.text = ""
         file = null
+        fileModificationDate = 0
     }
 
     private fun openFile() {
@@ -135,8 +139,9 @@ class Toolbar(
             JFileChooser.APPROVE_OPTION -> {
                 val selectedFile = fileChooser.selectedFile
                 editor.text = selectedFile.readText(Charsets.UTF_8)
-
                 messageArea.text = selectedFile.absolutePath
+                file = selectedFile
+                fileModificationDate = selectedFile.lastModified()
             }
 
             JFileChooser.CANCEL_OPTION -> {
@@ -154,6 +159,7 @@ class Toolbar(
             when (fileChooser.showSaveDialog(this@Toolbar)) {
                 JFileChooser.APPROVE_OPTION -> {
                     file = fileChooser.selectedFile
+                    fileModificationDate = fileChooser.selectedFile.lastModified()
                     messageArea.text = "Arquivo salvo em: ${file?.absolutePath}"
                 }
 
@@ -192,5 +198,16 @@ class Toolbar(
 
     private fun showTeam() {
         messageArea.text = "Equipe: Lucas Will, João Rodolfo Reiter, Lucas Eduardo \uD83D\uDE0E"
+    }
+
+    private fun listenForFileModifications() {
+        while (true) {
+            val lastModified = file?.lastModified() ?: 0
+            if (lastModified > fileModificationDate) {
+                fileModificationDate = lastModified
+                editor.text = file?.readText()
+            }
+            Thread.sleep(100)
+        }
     }
 }
