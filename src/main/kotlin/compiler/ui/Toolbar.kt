@@ -139,6 +139,7 @@ class Toolbar(
             JFileChooser.APPROVE_OPTION -> {
                 val selectedFile = fileChooser.selectedFile
                 editor.text = selectedFile.readText(Charsets.UTF_8)
+                statusBar.text = selectedFile.absolutePath
                 file = selectedFile
                 fileModificationDate = selectedFile.lastModified()
 

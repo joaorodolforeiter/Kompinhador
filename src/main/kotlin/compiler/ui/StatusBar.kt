@@ -11,8 +11,4 @@ class StatusBar : JLabel() {
     fun clear() {
         text = ""
     }
-
-    fun setMessage(msg: String) {
-        text = msg
-    }
 }
