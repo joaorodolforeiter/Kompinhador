@@ -1,35 +1,12 @@
 package compiler.ui
 
 import java.awt.*
-import java.awt.event.ActionEvent
-import java.awt.event.KeyEvent
 import javax.swing.*
-import javax.swing.undo.UndoManager
-import java.awt.event.InputEvent
 
 class CodeEditor : JFrame("Compilador") {
-
-    private val undoManager = UndoManager()
     private val console = Console()
     private val statusBar = StatusBar()
-
-    private val editor = JTextArea().apply {
-        val undoAction = object : AbstractAction("Undo") {
-            override fun actionPerformed(e: ActionEvent?) {
-                if (undoManager.canUndo()) {
-                    undoManager.undo()
-                }
-            }
-        }
-        border = NumberedBorder()
-        document.addUndoableEditListener {
-            undoManager.addEdit(it.edit)
-        }
-
-        var map = getInputMap(JComponent.WHEN_FOCUSED)
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction")
-        actionMap.put("undoAction", undoAction)
-    }
+    private val editor = Editor();
 
     init {
         size = 1500 by 800
@@ -44,7 +21,10 @@ class CodeEditor : JFrame("Compilador") {
 
         add(
             JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
-                topComponent = scrollPanel(editor).apply { minimumSize = 1500 by 300; preferredSize = 1500 by 400 }
+                topComponent = scrollPanel(editor).apply {
+                    minimumSize = 1500 by 300;
+                    preferredSize = 1500 by 400
+                }
                 bottomComponent = scrollPanel(console)
             }
         )

@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent
 import java.io.File
 
 class Toolbar(
-    private val editor: JTextArea,
+    private val editor: Editor,
     private val console: Console,
     private val statusBar: StatusBar
 ) : JToolBar("Toolbar") {
