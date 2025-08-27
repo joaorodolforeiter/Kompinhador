@@ -10,6 +10,9 @@ import java.awt.event.InputEvent
 class CodeEditor : JFrame("Compilador") {
 
     private val undoManager = UndoManager()
+    private val console = Console()
+    private val statusBar = StatusBar()
+
     private val editor = JTextArea().apply {
         val undoAction = object : AbstractAction("Undo") {
             override fun actionPerformed(e: ActionEvent?) {
@@ -27,10 +30,6 @@ class CodeEditor : JFrame("Compilador") {
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction")
         actionMap.put("undoAction", undoAction)
     }
-    private val console = JTextArea().apply { isEditable = false; background = Color.BLACK; foreground = Color.WHITE }
-    private val messageArea = JLabel().apply {
-        preferredSize = this@CodeEditor.width by 25
-    }
 
     init {
         size = 1500 by 800
@@ -39,7 +38,7 @@ class CodeEditor : JFrame("Compilador") {
         layout = BorderLayout()
 
         add(
-            Toolbar(editor, console, messageArea),
+            Toolbar(editor, console, statusBar),
             BorderLayout.NORTH
         )
 
@@ -50,7 +49,7 @@ class CodeEditor : JFrame("Compilador") {
             }
         )
 
-        add(messageArea, BorderLayout.SOUTH)
+        add(statusBar, BorderLayout.SOUTH)
 
         isVisible = true
     }

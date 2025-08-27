@@ -12,8 +12,8 @@ import java.io.File
 
 class Toolbar(
     private val editor: JTextArea,
-    private val console: JTextArea,
-    private val messageArea: JLabel
+    private val console: Console,
+    private val statusBar: StatusBar
 ) : JToolBar("Toolbar") {
 
     private var file: File? = null
@@ -125,8 +125,8 @@ class Toolbar(
 
     private fun newFile() {
         editor.text = ""
-        console.text = ""
-        messageArea.text = ""
+        console.clear();
+        statusBar.clear();
         file = null
     }
 
@@ -136,15 +136,15 @@ class Toolbar(
                 val selectedFile = fileChooser.selectedFile
                 editor.text = selectedFile.readText(Charsets.UTF_8)
 
-                messageArea.text = selectedFile.absolutePath
+                statusBar.text = selectedFile.absolutePath
             }
 
             JFileChooser.CANCEL_OPTION -> {
-                messageArea.text = "Operação cancelada pelo usuário."
+                statusBar.text = "Operação cancelada pelo usuário."
             }
 
             JFileChooser.ERROR_OPTION -> {
-                messageArea.text = "Ocorreu um erro ao selecionar o arquivo."
+                statusBar.text = "Ocorreu um erro ao selecionar o arquivo."
             }
         }
     }
@@ -154,15 +154,15 @@ class Toolbar(
             when (fileChooser.showSaveDialog(this@Toolbar)) {
                 JFileChooser.APPROVE_OPTION -> {
                     file = fileChooser.selectedFile
-                    messageArea.text = "Arquivo salvo em: ${file?.absolutePath}"
+                    statusBar.text = "Arquivo salvo em: ${file?.absolutePath}"
                 }
 
                 JFileChooser.CANCEL_OPTION -> {
-                    messageArea.text = "Operação cancelada pelo usuário."
+                    statusBar.text = "Operação cancelada pelo usuário."
                 }
 
                 JFileChooser.ERROR_OPTION -> {
-                    messageArea.text = "Ocorreu um erro ao salvar o arquivo."
+                    statusBar.text = "Ocorreu um erro ao salvar o arquivo."
                 }
             }
         }
@@ -187,10 +187,10 @@ class Toolbar(
     }
 
     private fun compile() {
-        messageArea.text = "Compilação de programas ainda não foi implementada"
+        console.appendLine("Compilação de programas ainda não foi implementada")
     }
 
     private fun showTeam() {
-        messageArea.text = "Equipe: Lucas Will, João Rodolfo Reiter, Lucas Eduardo \uD83D\uDE0E"
+        console.appendLine("Equipe: Lucas Will, João Rodolfo Reiter, Lucas Eduardo \uD83D\uDE0E")
     }
 }
