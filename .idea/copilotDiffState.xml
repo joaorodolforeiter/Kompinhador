@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/ClipboardHandler.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/ClipboardHandler.kt" />
+              <option name="originalContent" value="&#10;" />
+              <option name="updatedContent" value="&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/ClipboardOperations.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/ClipboardOperations.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/FileOperations.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/FileOperations.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/ClipboardOperationsDelegate.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/ClipboardOperationsDelegate.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/CompilationOperationsDelegate.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/CompilationOperationsDelegate.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/FileOperationsDelegate.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/FileOperationsDelegate.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/UIUtilitiesDelegate.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/kotlin/compiler/ui/delegates/UIUtilitiesDelegate.kt" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
