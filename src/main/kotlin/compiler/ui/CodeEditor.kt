@@ -28,6 +28,8 @@ class CodeEditor : JFrame("Compilador") {
         defaultCloseOperation = EXIT_ON_CLOSE
         setLocationRelativeTo(null)
 
+        iconImage = ImageIcon(javaClass.getResource("/icons/app.png")).image
+
         add(Toolbar().apply {
             button("Novo", "/icons/new.png", getKeyStroke(VK_N, CTRL_DOWN_MASK), fileHandler::newFile)
             button("Abrir", "/icons/open.png", getKeyStroke(VK_O, CTRL_DOWN_MASK), fileHandler::openFile)
