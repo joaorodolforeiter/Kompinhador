@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.0"
     id("com.gradleup.shadow") version "8.3.0"
+    application
 }
 
 group = "org.example"
@@ -12,13 +13,13 @@ repositories {
 
 dependencies {
     implementation("com.formdev:flatlaf:3.6")
-
     testImplementation(kotlin("test"))
 }
 
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(17)
 }
@@ -32,4 +33,8 @@ tasks.shadowJar {
     manifest {
         attributes["Main-Class"] = "compiler.MainKt"
     }
+}
+
+application {
+    mainClass.set("compiler.MainKt")
 }

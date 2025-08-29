@@ -57,13 +57,18 @@ class CodeEditor : JFrame("Compilador") {
     private fun copy() {
         Clipboard.copy(editor.selectedText ?: editor.text)
     }
+
     private fun paste() {
         val text = Clipboard.paste()
         editor.insert(text, editor.caretPosition)
     }
 
     private fun cut() {
-        if (editor.selectedText == null) return
+        if (editor.selectedText == null) {
+            Clipboard.copy(editor.text)
+            editor.text = ""
+            return
+        }
 
         Clipboard.copy(editor.selectedText)
         editor.replaceSelection("")
@@ -72,8 +77,9 @@ class CodeEditor : JFrame("Compilador") {
     private fun compile() {
         console.appendLine("Compilação de programas ainda não foi implementada")
     }
+    
     private fun showTeam() {
-        console.appendLine("Equipe: Lucas Will, João Rodolfo Reiter, Lucas Eduardo \uD83D\uDE0E")
+        console.appendLine("Equipe: João Rodolfo Reiter, Lucas Eduardo, Lucas Will \uD83D\uDE0E")
     }
 
     private fun scrollPane(component: Component) = JScrollPane(
