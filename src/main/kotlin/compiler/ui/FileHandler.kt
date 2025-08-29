@@ -4,6 +4,7 @@ import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import kotlin.concurrent.thread
+import kotlin.io.writeText
 
 class FileHandler(
     private val onFileChanged: (String) -> Unit,
@@ -27,8 +28,13 @@ class FileHandler(
 
     fun openFile() {
         val selectedFile = getFile()
+        
+
 
         if (selectedFile != null) {
+            if (!selectedFile.exists()) {
+                selectedFile.createNewFile();
+            }
             currentFile = selectedFile
             fileModificationDate = selectedFile.lastModified()
 
