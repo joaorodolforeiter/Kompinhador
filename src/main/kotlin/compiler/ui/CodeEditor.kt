@@ -1,9 +1,18 @@
 package compiler.ui
 
-import java.awt.*
+import Lexico
+import compiler.backend.LexerException
+import compiler.backend.Lexer
+import org.fife.ui.rtextarea.RTextScrollPane
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Dimension
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import java.awt.event.KeyEvent.*
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.JFrame
+import javax.swing.JScrollPane
+import javax.swing.JSplitPane
 import javax.swing.JSplitPane.VERTICAL_SPLIT
 import javax.swing.KeyStroke.getKeyStroke
 
@@ -12,6 +21,8 @@ class CodeEditor : JFrame("Compilador") {
     private val editor = Editor()
     private val console = Console()
     private val statusBar = StatusBar()
+
+    private val lexer = Lexer()
 
     private val fileHandler = FileHandler(
         onFileChanged = {
@@ -43,7 +54,11 @@ class CodeEditor : JFrame("Compilador") {
 
         add(JSplitPane().apply {
             orientation = VERTICAL_SPLIT
-            topComponent = scrollPane(editor).apply { preferredSize = Dimension(1500, 400) }
+            topComponent = RTextScrollPane(editor).apply {
+                preferredSize = Dimension(1500, 400)
+                verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+                horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
+            }
             bottomComponent = scrollPane(console)
         }, BorderLayout.CENTER)
 
@@ -77,9 +92,22 @@ class CodeEditor : JFrame("Compilador") {
     }
 
     private fun compile() {
-        console.appendLine("Compilação de programas ainda não foi implementada")
+        console.clear()
+
+        try {
+            val tokens = lexer.tokenize(editor.text)
+
+            for (token in tokens) {
+                val tokenName = Lexico.VOCABULARY.getSymbolicName(token.type) ?: token.type.toString()
+
+                console.appendLine("Token: Linha ${token.line} '${token.text}'; Tipo: $tokenName")
+            }
+
+        } catch (e: LexerException) {
+            console.appendLine("Erro léxico: ${e.message}")
+        }
     }
-    
+
     private fun showTeam() {
         console.appendLine("Equipe: João Rodolfo Reiter, Lucas Eduardo, Lucas Will \uD83D\uDE0E")
     }
