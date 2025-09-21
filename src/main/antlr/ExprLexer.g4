@@ -1,4 +1,4 @@
-lexer grammar Lexico;
+lexer grammar ExprLexer;
 
 // ----------------------------
 // DEFINIÇÕES DE FRAGMENTOS
