@@ -3,6 +3,7 @@ package compiler.ui
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
+import javax.swing.Timer
 import kotlin.concurrent.thread
 import kotlin.io.writeText
 
@@ -16,7 +17,7 @@ class FileHandler(
     private var fileModificationDate: Long = 0
 
     init {
-        thread { listenForFileModifications() }
+        Timer(1000) { listenForFileModifications() }
     }
 
     fun newFile() {
@@ -28,8 +29,6 @@ class FileHandler(
 
     fun openFile() {
         val selectedFile = getFile()
-        
-
 
         if (selectedFile != null) {
             if (!selectedFile.exists()) {

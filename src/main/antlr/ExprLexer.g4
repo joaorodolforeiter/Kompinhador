@@ -7,6 +7,9 @@ fragment DIG: [0-9] ;
 fragment MAI: [A-Z] ;
 fragment MIN: [a-z] ;
 
+fragment LINHA : '#' ~[\n]* ;
+fragment BLOCO : '{' (~[/{])* '}' ;
+
 fragment INTEIRO : [1-9] DIG? DIG? DIG? DIG? | '0' ;
 
 fragment DECIMAL : DIG? DIG? DIG? DIG? [1-9] | '0' ;
@@ -75,6 +78,6 @@ WS : [ \t\r\n]+ -> skip ;
 // ----------------------------
 // COMENTÁRIOS
 // ----------------------------
-LINE_COMMENT : '#' ~[\n]* -> skip ;
+LINE_COMMENT : LINHA -> skip ;
 
-BLOCK_COMMENT : '{' (~[/{])* '}' -> skip ;
+BLOCK_COMMENT : BLOCO -> skip ;
