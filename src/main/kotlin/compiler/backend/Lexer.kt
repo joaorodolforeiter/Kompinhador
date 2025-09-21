@@ -1,6 +1,6 @@
 package compiler.backend
 
-import Lexico
+import ExprLexer
 import org.antlr.v4.runtime.*
 
 class Lexer() {
@@ -17,7 +17,7 @@ class Lexer() {
     }
 
     fun tokenize(input: String): List<Token> {
-        val lexer = Lexico(CharStreams.fromString(input)).apply {
+        val lexer = ExprLexer(CharStreams.fromString(input)).apply {
             removeErrorListeners()
             addErrorListener(errorListener)
         }
