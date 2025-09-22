@@ -10,44 +10,6 @@ class Editor : RSyntaxTextArea() {
     private val undoManager = UndoManager()
 
     init {
-        text = """
-            begin
-                // Declaracao de variaveis
-                int x;
-                float y;
-                bool flag;
-                string nome;
-                list nums;
-
-                // Atribuicoes
-                x <- 10;
-                y <- 3.14;'
-                flag <- true;
-                nome <- "João";
-                nums <- {1, 2, 3, 4, 5};
-
-                // Condicional
-                if x > 5 do
-                    print("x é maior que 5");
-                else
-                    print("x é menor ou igual a 5");
-                end
-
-                // Loop com until
-                int contador;
-                contador <- 0;
-                until contador == 5 do
-                    print(contador);
-                    contador <- contador + 1;
-                end
-
-                // Funcoes basicas simuladas
-                print("Nome: " + nome);
-                print("Numero de elementos na lista: " + count(nums));
-
-            end
-        """.trimIndent()
-
         document.addUndoableEditListener {
             undoManager.addEdit(it.edit)
         }
