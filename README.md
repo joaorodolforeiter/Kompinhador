@@ -11,6 +11,6 @@
 
 ## Autores
 
-**João Rodolfo Reiter** - [GitHub](https://github.com/joaorodolforeiter)
-**Lucas Eduardo Kreuch** - [GitHub](https://github.com/Luc4sKr)
-**Lucas Will** - [GitHub](https://github.com/LucasWillBlumenau)
+- **João Rodolfo Reiter** - [GitHub](https://github.com/joaorodolforeiter)
+- **Lucas Eduardo Kreuch** - [GitHub](https://github.com/Luc4sKr)
+- **Lucas Will** - [GitHub](https://github.com/LucasWillBlumenau)
