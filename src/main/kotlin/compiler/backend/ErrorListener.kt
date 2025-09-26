@@ -33,7 +33,7 @@ object ErrorListener : BaseErrorListener() {
 
     private fun getErrorMessage(context: String, text: String): String = when {
         context[0].uppercaseChar() in 'A'..'Z'
-            -> "$context símbolo inválido"
+            -> "$context identificador inválido"
 
         context.contains('"') && context.lastIndexOf('"') > context.lastIndexOf('\n')
             -> "constante_string inválida"
