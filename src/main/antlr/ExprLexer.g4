@@ -46,6 +46,13 @@ PR_UNTIL     : 'until' ;
 // ----------------------------
 IDENTIFICADOR : (MAI MIN | MIN)+ ('_' DIG+)? ;
 
+INVALID_IDENTIFIER
+    : ( DIG+ (MAI | MIN | '_') (MAI | MIN | DIG | '_')*
+      | '_' (MAI | MIN | DIG | '_')*
+      | (MAI | MIN)+ ('_' DIG* '_' | '_' ) (MAI | MIN | DIG | '_')*
+      )
+    ;
+
 CINT : INTEIRO ;
 
 CFLOAT : INTEIRO '.' DECIMAL ;
@@ -81,3 +88,5 @@ WS : [ \t\r\n]+ -> skip ;
 LINE_COMMENT : LINHA -> skip ;
 
 BLOCK_COMMENT : BLOCO -> skip ;
+
+INVALID_CHAR : . -> channel(HIDDEN) ;

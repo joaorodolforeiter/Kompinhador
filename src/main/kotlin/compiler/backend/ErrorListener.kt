@@ -1,49 +1,22 @@
 package compiler.backend
 
-import ExprLexer
-import org.antlr.v4.runtime.BaseErrorListener
-import org.antlr.v4.runtime.LexerNoViableAltException
-import org.antlr.v4.runtime.RecognitionException
-import org.antlr.v4.runtime.Recognizer
-import org.antlr.v4.runtime.misc.Interval
+import org.antlr.v4.runtime.*
 
-
-object ErrorListener : BaseErrorListener() {
-
+class ErrorListener : BaseErrorListener() {
     override fun syntaxError(
         recognizer: Recognizer<*, *>?,
         offendingSymbol: Any?,
         line: Int,
-        charPosition: Int,
+        charPositionInLine: Int,
         msg: String?,
         e: RecognitionException?
     ) {
-        val lexer = recognizer as ExprLexer
-
-        if (e is LexerNoViableAltException) throwError(lexer, e, line)
-    }
-
-    private fun throwError(lexico: ExprLexer, e: LexerNoViableAltException, line: Int) {
-
-        val text = e.inputStream?.getText(Interval(e.startIndex, e.startIndex)) ?: ""
-
-        val context = lexico.inputStream?.getText(Interval(0.coerceAtLeast(e.startIndex - 30), e.startIndex)) ?: ""
-
-        throw LexerException("Linha $line: ${getErrorMessage(context, text)}")
-    }
-
-    private fun getErrorMessage(context: String, text: String): String = when {
-        context.contains('"') && context.lastIndexOf('"') > context.lastIndexOf('\n') -> {
-            "constante_string inválida"
+        val token = offendingSymbol as? Token
+        val errorMsg = when (token?.type) {
+            ExprLexer.INVALID_IDENTIFIER -> "Erro: Identificador inválido '${token.text}' na linha $line:$charPositionInLine"
+            else -> "Erro sintático: $msg na linha $line:$charPositionInLine"
         }
-
-        context.lastIndexOf('{') > context.lastIndexOf('}') -> {
-            "comentário inválido ou não finalizado"
-        }
-
-        else -> {
-            "$text símbolo inválido"
-        }
+        println(errorMsg)  // Ou logue de outra forma
+        // Aqui você pode throw se quiser, mas BailErrorStrategy já faz isso
     }
-
 }

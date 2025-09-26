@@ -1,7 +1,13 @@
 package compiler.ui
 
+import ExprLexer
+import ExprParser
+import compiler.backend.ErrorListener
 import compiler.backend.LexerException
 import compiler.backend.Lexer
+import org.antlr.v4.runtime.ANTLRInputStream
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Token
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
@@ -34,6 +40,8 @@ class CodeEditor : JFrame("Compilador") {
     )
 
     init {
+        editor.text = "0_abbc"
+
         size = Dimension(1500, 800)
         layout = BorderLayout()
         isResizable = false
@@ -96,56 +104,42 @@ class CodeEditor : JFrame("Compilador") {
         console.clear()
 
         try {
-            val tokens = lexer.tokenize(editor.text)
+            val input = ANTLRInputStream(editor.text)  // Input do editor
+            val lexer = ExprLexer(input)
+            val tokens = CommonTokenStream(lexer)
+            tokens.fill()
 
-            printTokens(tokens)
+            val tokenList = tokens.getTokens()
+            println(tokenList)
 
+            for (token in tokenList) {
+                when (token.type) {
+                    ExprLexer.INVALID_IDENTIFIER -> {
+                        println("Linha ${token.line}: identificador inválido")  // Ou throw LexerException
+                    }
+//                    ExprLexer.INVALID_STRING -> {
+//                        println("Linha ${token.line}: constante_string inválida")
+//                    }
+//                    ExprLexer.INVALID_BLOCK_COMMENT -> {
+//                        println("Linha ${token.line}: comentário inválido ou não finalizado")
+//                    }
+//                    ExprLexer.INVALID_SYMBOL -> {
+//                        println("Linha ${token.line}: ${token.text} símbolo inválido")
+//                    }
+                }
+            }
+
+//          val parser = ExprParser(tokens)
+//          parser.removeErrorListeners()
+//          parser.addErrorListener(ErrorListener())
+
+            //val tree = parser.program()
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")
         }
     }
 
-    private fun printTokens(tokens: List<Token>) {
-
-        if (tokens.isEmpty()) {
-            return console.appendLine("Nenhum token encontrado")
-        }
-
-        val maxLength = (tokens.maxOfOrNull { it.text.length } ?: 0).coerceAtLeast(5)
-
-        console.appendLine("-".repeat(maxLength + 35))
-        console.appendLine("| %5s | %-20s | %-${maxLength}s |".format("Linha", "Nome", "Texto"))
-        console.appendLine("-".repeat(maxLength + 35))
-
-        for (token in tokens) {
-            console.appendLine("| %5s | %-20s | %-${maxLength}s |".format(token.line, token.getClass(), token.text))
-        }
-
-        console.appendLine("-".repeat(maxLength + 35))
-    }
-
     private fun showTeam() {
         console.appendLine("Equipe: João Rodolfo Reiter, Lucas Eduardo, Lucas Will \uD83D\uDE0E")
-    }
-
-    fun Token.getClass(): String = when (ExprLexer.VOCABULARY.getSymbolicName(type) ?: type.toString()) {
-        "PR_ADD", "PR_AND", "PR_BEGIN", "PR_BOOL", "PR_COUNT",
-        "PR_DELETE", "PR_DO", "PR_ELEMENTOF", "PR_ELSE", "PR_END",
-        "PR_FALSE", "PR_FLOAT", "PR_IF", "PR_INT", "PR_LIST",
-        "PR_NOT", "PR_OR", "PR_PRINT", "PR_READ", "PR_SIZE",
-        "PR_STRING", "PR_TRUE", "PR_UNTIL"
-            -> "palavra reservada"
-
-        "PLUS", "MINUS", "TIMES", "DIV", "EQEQ",
-        "NEQ", "LT", "GT", "EQ", "ASSIGN",
-        "LPAREN", "RPAREN", "SEMI", "COMMA"
-            -> "símbolo especial"
-
-        "IDENTIFICADOR" -> "identificador"
-        "CINT" -> "constante_int"
-        "CFLOAT" -> "constante_float"
-        "STRING" -> "constante_string"
-
-        else -> error("Classe não encontrada")
     }
 }
