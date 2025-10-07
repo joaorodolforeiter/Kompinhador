@@ -6,7 +6,7 @@ program
     ;
 
 instructions
-    : instruction repeat_instruction
+    : instruction SEMI repeat_instruction
     ;
 
 repeat_instruction
@@ -19,13 +19,26 @@ instruction
     | command
     ;
 
+//command
+//    : list_manipulation
+//    | assignment
+//    | read_statement
+//    | print_statement
+//    | if_statement
+//    | do_until_statement
+//    ;
+
 command
-    : list_manipulation
-    | assignment
+    : IDENTIFICADOR var_manipulation
     | read_statement
     | print_statement
     | if_statement
     | do_until_statement
+    ;
+
+var_manipulation
+    : list_manipulation
+    | assignment_value
     ;
 
 def_var
@@ -53,13 +66,9 @@ repeat_identifiers
     | 
     ;
 
-expression
-    :
-    ;
-
-assignment
-    : IDENTIFICADOR assignment_value
-    ;
+//assignment
+//    : IDENTIFICADOR assignment_value
+//    ;
 
 assignment_value
     : EQ expression
@@ -72,11 +81,11 @@ list_manipulation
     ;
 
 list_add
-    : IDENTIFICADOR PR_ADD LPAREN expression COMMA expression RPAREN
+    : PR_ADD LPAREN expression COMMA expression RPAREN
     ;
 
 list_delete
-    : IDENTIFICADOR PR_DELETE LPAREN expression RPAREN
+    : PR_DELETE LPAREN expression RPAREN
     ;
 
 read_statement
@@ -124,10 +133,80 @@ do_until_statement
     ;
 
 commands
-    : command repeat_commands
+    : command SEMI repeat_commands
     ;
 
 repeat_commands
     : commands
+    |
+    ;
+
+expression
+    : valor expression_
+    ;
+
+expression_
+    : PR_AND valor expression_
+    | PR_OR valor expression_
+    |
+    ;
+
+valor
+    : relacional
+    | PR_TRUE
+    | PR_FALSE
+    | PR_NOT valor
+    ;
+
+relacional
+    : aritmetica relacional_
+    ;
+
+relacional_
+    : operador_relacional aritmetica
+    |
+    ;
+
+operador_relacional
+    : EQEQ
+    | NEQ
+    | LT
+    | GT
+    ;
+
+aritmetica
+    : termo aritmetica_
+    ;
+
+aritmetica_
+    : PLUS termo aritmetica_
+    | MINUS termo aritmetica_
+    |
+    ;
+
+termo
+    : fator termo_
+    ;
+
+termo_
+    : TIMES fator termo_
+    | DIV fator termo_
+    |
+    ;
+
+fator
+    : IDENTIFICADOR fator_
+    | CINT
+    | CFLOAT
+    | STRING
+    | LPAREN expression RPAREN
+    | PLUS fator
+    | MINUS fator
+    ;
+
+fator_
+    : PR_COUNT
+    | PR_SIZE
+    | PR_ELEMENTOF LPAREN expression RPAREN
     |
     ;
