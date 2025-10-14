@@ -1,8 +1,13 @@
 package compiler.ui
 
-import compiler.backend.LexerException
+import ExprLexer
+import ExprParser
 import compiler.backend.Lexer
+import compiler.backend.LexerException
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -96,9 +101,18 @@ class CodeEditor : JFrame("Compilador") {
         console.clear()
 
         try {
-            val tokens = lexer.tokenize(editor.text)
+            val input = CharStreams.fromString(editor.text)
+            val lexer = ExprLexer(input)
+            val tokens = CommonTokenStream(lexer)
 
-            printTokens(tokens)
+            try {
+                val parser = ExprParser(tokens)
+                parser.addErrorListener(ParserErrorListener())
+                val tree = parser.program()
+                print(tree.toStringTree(parser))
+            } catch (e: ParseCancellationException) {
+                System.err.println("Erro durante o parsing: " + e.message)
+            }
 
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")

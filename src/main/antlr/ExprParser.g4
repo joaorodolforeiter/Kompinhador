@@ -19,15 +19,6 @@ instruction
     | command
     ;
 
-//command
-//    : list_manipulation
-//    | assignment
-//    | read_statement
-//    | print_statement
-//    | if_statement
-//    | do_until_statement
-//    ;
-
 command
     : IDENTIFICADOR var_manipulation
     | read_statement
