@@ -57,10 +57,6 @@ repeat_identifiers
     | 
     ;
 
-//assignment
-//    : IDENTIFICADOR assignment_value
-//    ;
-
 assignment_value
     : EQ expression
     | ASSIGN expression
