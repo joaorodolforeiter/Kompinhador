@@ -4,15 +4,14 @@ import ExprLexer
 import ExprParser
 import compiler.backend.Lexer
 import compiler.backend.LexerException
-import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import java.awt.event.KeyEvent.*
+import java.util.*
 import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.JScrollPane
@@ -21,6 +20,7 @@ import javax.swing.JSplitPane.VERTICAL_SPLIT
 import javax.swing.KeyStroke.getKeyStroke
 import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS
 import javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
+
 
 class CodeEditor : JFrame("Compilador") {
 
@@ -107,7 +107,10 @@ class CodeEditor : JFrame("Compilador") {
 
             try {
                 val parser = ExprParser(tokens)
-                parser.addErrorListener(ParserErrorListener())
+                parser.removeErrorListeners()
+                parser.addErrorListener(VerboseListener())
+                parser.addErrorListener(UnderlineListener())
+
                 val tree = parser.program()
                 print(tree.toStringTree(parser))
             } catch (e: ParseCancellationException) {
@@ -161,5 +164,58 @@ class CodeEditor : JFrame("Compilador") {
         "STRING" -> "constante_string"
 
         else -> error("Classe não encontrada")
+    }
+}
+
+public class VerboseListener : BaseErrorListener() {
+    public override fun syntaxError(
+        recognizer: Recognizer<*, *>,
+        offendingSymbol: Any?,
+        line: Int, charPositionInLine: Int,
+        msg: String?,
+        e: RecognitionException?
+    ) {
+        val stack = (recognizer as Parser).ruleInvocationStack
+        Collections.reverse(stack)
+        System.err.println("rule stack: " + stack)
+        System.err.println(
+            "line " + line + ":" + charPositionInLine + " at " +
+                    offendingSymbol + ": " + msg
+        )
+    }
+}
+
+public class UnderlineListener : BaseErrorListener() {
+    override fun syntaxError(
+        recognizer: Recognizer<*, *>,
+        offendingSymbol: Any?,
+        line: Int, charPositionInLine: Int,
+        msg: String?,
+        e: RecognitionException?
+    ) {
+        System.err.println("line " + line + ":" + charPositionInLine + " " + msg)
+        underlineError(
+            recognizer, (offendingSymbol as Token?)!!,
+            line, charPositionInLine
+        )
+    }
+
+    fun underlineError(
+        recognizer: Recognizer<*,*>,
+        offendingToken: Token, line: Int,
+        charPositionInLine: Int
+    ) {
+        val tokens = recognizer.inputStream as CommonTokenStream
+        val input = tokens.getTokenSource().inputStream.toString()
+        val lines: Array<String?> = input.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val errorLine = lines[line - 1]
+        System.err.println(errorLine)
+        for (i in 0..<charPositionInLine) System.err.print(" ")
+        val start = offendingToken.startIndex
+        val stop = offendingToken.stopIndex
+        if (start >= 0 && stop >= 0) {
+            for (i in start..stop) System.err.print("^")
+        }
+        System.err.println()
     }
 }
