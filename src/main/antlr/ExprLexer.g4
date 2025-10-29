@@ -65,10 +65,10 @@ LT          : '<'  ;
 GT          : '>'  ;
 EQ          : '='  ;
 ASSIGN      : '<-' ;
+COMMA       : ','  ;
 LPAREN      : '('  ;
 RPAREN      : ')'  ;
 SEMI        : ';'  ;
-COMMA       : ','  ;
 
 // ----------------------------
 // IGNORAR ESPAÇOS/FORMATOS

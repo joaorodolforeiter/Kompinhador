@@ -6,9 +6,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
 class Compiler {
-
     fun compile(text: String) {
-
         val stream = CharStreams.fromString(text)
 
         val lexer = ExprLexer(stream).apply {
@@ -27,5 +25,4 @@ class Compiler {
 
         print(tree.toStringTree(parser))
     }
-
 }

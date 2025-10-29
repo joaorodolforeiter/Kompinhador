@@ -1,6 +1,7 @@
 package compiler.backend
 
 import ExprLexer
+import compiler.exceptions.LexerException
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.LexerNoViableAltException
 import org.antlr.v4.runtime.RecognitionException
@@ -28,7 +29,7 @@ object LexerErrorListener : BaseErrorListener() {
         val context = lexico.inputStream?.getText(
             Interval(0.coerceAtLeast(e.startIndex - 30), e.startIndex)) ?: ""
 
-        throw LexerException("Linha $line: ${getErrorMessage(context, text)}")
+        throw LexerException("linha $line: ${getErrorMessage(context, text)}")
     }
 
     private fun getErrorMessage(context: String, text: String): String = when {

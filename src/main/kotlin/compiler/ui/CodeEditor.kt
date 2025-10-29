@@ -1,7 +1,8 @@
 package compiler.ui
 
 import compiler.backend.Compiler
-import compiler.backend.LexerException
+import compiler.exceptions.LexerException
+import compiler.exceptions.ParserException
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -100,6 +101,8 @@ class CodeEditor : JFrame("Compilador") {
             console.appendLine("programa compilado com sucesso")
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")
+        } catch (e: ParserException) {
+            console.appendLine(e.message ?: "Erro sintático desconhecido")
         }
     }
 
