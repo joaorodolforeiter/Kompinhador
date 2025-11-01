@@ -1,8 +1,8 @@
 package compiler.ui
 
-import compiler.backend.LexerException
-import compiler.backend.Lexer
-import org.antlr.v4.runtime.Token
+import compiler.backend.Compiler
+import compiler.exceptions.LexerException
+import compiler.exceptions.ParserException
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -23,7 +23,7 @@ class CodeEditor : JFrame("Compilador") {
     private val console = Console()
     private val statusBar = StatusBar()
 
-    private val lexer = Lexer()
+    private val compiler = Compiler()
 
     private val fileHandler = FileHandler(
         onFileChanged = {
@@ -96,56 +96,18 @@ class CodeEditor : JFrame("Compilador") {
         console.clear()
 
         try {
-            val tokens = lexer.tokenize(editor.text)
+            compiler.compile(editor.text)
 
-            printTokens(tokens)
-
+            console.appendLine("programa compilado com sucesso")
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")
+        } catch (e: ParserException) {
+            console.appendLine(e.message ?: "Erro sintático desconhecido")
         }
-    }
-
-    private fun printTokens(tokens: List<Token>) {
-
-        if (tokens.isEmpty()) {
-            return console.appendLine("Nenhum token encontrado")
-        }
-
-        val maxLength = (tokens.maxOfOrNull { it.text.length } ?: 0).coerceAtLeast(5)
-
-        console.appendLine("-".repeat(maxLength + 35))
-        console.appendLine("| %5s | %-20s | %-${maxLength}s |".format("Linha", "Nome", "Texto"))
-        console.appendLine("-".repeat(maxLength + 35))
-
-        for (token in tokens) {
-            console.appendLine("| %5s | %-20s | %-${maxLength}s |".format(token.line, token.getClass(), token.text))
-        }
-
-        console.appendLine("-".repeat(maxLength + 35))
     }
 
     private fun showTeam() {
         console.appendLine("Equipe: João Rodolfo Reiter, Lucas Eduardo, Lucas Will \uD83D\uDE0E")
     }
 
-    fun Token.getClass(): String = when (ExprLexer.VOCABULARY.getSymbolicName(type) ?: type.toString()) {
-        "PR_ADD", "PR_AND", "PR_BEGIN", "PR_BOOL", "PR_COUNT",
-        "PR_DELETE", "PR_DO", "PR_ELEMENTOF", "PR_ELSE", "PR_END",
-        "PR_FALSE", "PR_FLOAT", "PR_IF", "PR_INT", "PR_LIST",
-        "PR_NOT", "PR_OR", "PR_PRINT", "PR_READ", "PR_SIZE",
-        "PR_STRING", "PR_TRUE", "PR_UNTIL"
-            -> "palavra reservada"
-
-        "PLUS", "MINUS", "TIMES", "DIV", "EQEQ",
-        "NEQ", "LT", "GT", "EQ", "ASSIGN",
-        "LPAREN", "RPAREN", "SEMI", "COMMA"
-            -> "símbolo especial"
-
-        "IDENTIFICADOR" -> "identificador"
-        "CINT" -> "constante_int"
-        "CFLOAT" -> "constante_float"
-        "STRING" -> "constante_string"
-
-        else -> error("Classe não encontrada")
-    }
 }

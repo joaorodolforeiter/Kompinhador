@@ -14,6 +14,14 @@ class Editor : RSyntaxTextArea() {
             undoManager.addEdit(it.edit)
         }
 
+        text = """
+            begin 
+             int lado; 
+             read ("digite um valor para lado: ", lado 
+             print ("o valor digitado foi: ", lado); 
+            end
+        """.trimIndent()
+
         registerShortcut(KeyEvent.VK_Z, "undo", ::undo)
         registerShortcut(KeyEvent.VK_Y, "redo", ::redo)
     }
