@@ -15,7 +15,7 @@ class CompilerTest {
     }
 
     @Test
-    fun `deve compilar sem erros`() {
+    fun `deve compilar sem erros 👌`() {
         val input =
             """
             begin
@@ -31,7 +31,7 @@ class CompilerTest {
     }
 
     @Test
-    fun `deve lançar LexerException ao detectar string mal formada`() {
+    fun `deve lançar LexerException ao detectar string mal formada 🛑`() {
         val input =
             """
             begin
@@ -50,7 +50,7 @@ class CompilerTest {
     }
 
     @Test
-    fun `deve lançar ParserException ao faltar parêntese na chamada de função`() {
+    fun `deve lançar ParserException ao faltar parêntese na chamada de função 😞`() {
         val input =
             """
             begin

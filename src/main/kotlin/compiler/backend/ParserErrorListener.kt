@@ -34,9 +34,6 @@ object ParserErrorListener : BaseErrorListener() {
         return when (token.type) {
             ExprParser.EOF -> "EOF"
             ExprParser.STRING -> "constante_string"
-            ExprParser.CINT -> token.text
-            ExprParser.CFLOAT -> token.text
-            ExprParser.IDENTIFICADOR -> token.text
 
             // Palavras reservadas e símbolos especiais - retornar o lexema
             else -> token.text
@@ -55,8 +52,11 @@ object ParserErrorListener : BaseErrorListener() {
             ExprParser.PR_STRING,
             ExprParser.PR_LIST
         )
-        if (tokenSet == allTypes) {
-            return "tipo"
+
+        if (tokenSet.containsAll(allTypes)) {
+            val remaingTokens = (tokenSet - allTypes).sorted();
+            val tokensNames = remaingTokens.map(::getTokenName) +  "tipo"
+            return tokensNames.joinToString(separator = " ")
         }
 
         val primitiveTypes = setOf(
