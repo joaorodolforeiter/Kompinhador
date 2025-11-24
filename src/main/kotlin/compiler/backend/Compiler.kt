@@ -15,6 +15,7 @@ class Compiler {
         }
 
         val tokens = CommonTokenStream(lexer)
+        tokens.fill()
 
         val parser = ExprParser(tokens).apply {
             removeErrorListeners()
@@ -22,7 +23,5 @@ class Compiler {
         }
 
         val tree = parser.program()
-
-        print(tree.toStringTree(parser))
     }
 }
