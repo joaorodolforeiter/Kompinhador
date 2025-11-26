@@ -1,10 +1,10 @@
 package compiler.ui
 
 import java.io.File
+import java.nio.file.Files
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.Timer
-import kotlin.concurrent.thread
 import kotlin.io.writeText
 
 class FileHandler(
@@ -14,6 +14,8 @@ class FileHandler(
     private val fileChooser = JFileChooser().apply { dialogTitle = "Selecione um arquivo" }
 
     private var currentFile: File? = null
+    private var assemblyFile: File? = null
+
     private var fileModificationDate: Long = 0
 
     init {
@@ -49,7 +51,14 @@ class FileHandler(
 
         synchronized(this) {
             currentFile?.writeText(content)
+            onFileChanged(content)
             fileModificationDate = currentFile?.lastModified() ?: 0
+        }
+    }
+
+    fun createAssemblyFile(content: String) {
+        currentFile?.let { vaiCorinthians ->
+            Files.writeString(vaiCorinthians.toPath().parent.toAbsolutePath().resolve("${vaiCorinthians.name.substringBeforeLast(".")}.il"), content, Charsets.UTF_8)
         }
     }
 
@@ -81,5 +90,4 @@ class FileHandler(
             Thread.sleep(100)
         }
     }
-
 }

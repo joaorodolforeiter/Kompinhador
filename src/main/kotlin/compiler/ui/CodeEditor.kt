@@ -94,10 +94,12 @@ class CodeEditor : JFrame("Compilador") {
 
     private fun compile() {
         console.clear()
+        fileHandler.saveFile(editor.text)
 
         try {
             compiler.compile(editor.text)
 
+            fileHandler.createAssemblyFile("")
             console.appendLine("programa compilado com sucesso")
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")
