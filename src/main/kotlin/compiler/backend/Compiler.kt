@@ -2,6 +2,8 @@ package compiler.backend
 
 import ExprLexer
 import ExprParser
+import compiler.backend.listeners.LexerErrorListener
+import compiler.backend.listeners.ParserErrorListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 

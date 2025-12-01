@@ -24,6 +24,16 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
 
+tasks.generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments = arguments + listOf("-visitor", "-no-listener")
+}
+
+tasks.generateTestGrammarSource {
+    maxHeapSize = "64m"
+    arguments = arguments + listOf("-visitor", "-no-listener")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
