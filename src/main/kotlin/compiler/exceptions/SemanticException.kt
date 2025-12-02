@@ -1,3 +1,3 @@
 package compiler.exceptions
 
-class SemanticError(message: String) : Exception(message)
+class SemanticException(message: String) : Exception(message)

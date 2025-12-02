@@ -4,11 +4,12 @@ import ExprLexer
 import ExprParser
 import compiler.backend.listeners.LexerErrorListener
 import compiler.backend.listeners.ParserErrorListener
+import compiler.backend.visitors.ExprSemanticListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
 class Compiler {
-    fun compile(text: String) {
+    fun compile(text: String): String {
         val stream = CharStreams.fromString(text)
 
         val lexer = ExprLexer(stream).apply {
@@ -19,11 +20,16 @@ class Compiler {
         val tokens = CommonTokenStream(lexer)
         tokens.fill()
 
+        val listener = ExprSemanticListener()
+
         val parser = ExprParser(tokens).apply {
             removeErrorListeners()
+            addParseListener(listener)
             addErrorListener(ParserErrorListener)
         }
 
-        val tree = parser.program()
+        parser.program()
+
+        return listener.getCode()
     }
 }

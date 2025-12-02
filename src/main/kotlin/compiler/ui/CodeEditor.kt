@@ -3,6 +3,7 @@ package compiler.ui
 import compiler.backend.Compiler
 import compiler.exceptions.LexerException
 import compiler.exceptions.ParserException
+import compiler.exceptions.SemanticException
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -94,17 +95,21 @@ class CodeEditor : JFrame("Compilador") {
 
     private fun compile() {
         console.clear()
-        fileHandler.saveFile(editor.text)
+        //fileHandler.saveFile(editor.text)
 
         try {
-            compiler.compile(editor.text)
+            val code = compiler.compile(editor.text)
 
-            fileHandler.createAssemblyFile("")
+            println(code)
+
+          //  fileHandler.createAssemblyFile("")
             console.appendLine("programa compilado com sucesso")
         } catch (e: LexerException) {
             console.appendLine(e.message ?: "Erro léxico desconhecido")
         } catch (e: ParserException) {
             console.appendLine(e.message ?: "Erro sintático desconhecido")
+        } catch (e: SemanticException) {
+            console.appendLine(e.message ?: "Erro semântico desconhecido")
         }
     }
 

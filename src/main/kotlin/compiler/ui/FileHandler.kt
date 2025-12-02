@@ -2,6 +2,7 @@ package compiler.ui
 
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Files.writeString
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.Timer
@@ -57,8 +58,11 @@ class FileHandler(
     }
 
     fun createAssemblyFile(content: String) {
-        currentFile?.let { vaiCorinthians ->
-            Files.writeString(vaiCorinthians.toPath().parent.toAbsolutePath().resolve("${vaiCorinthians.name.substringBeforeLast(".")}.il"), content, Charsets.UTF_8)
+        currentFile?.let { file ->
+            val fileName = "${file.name.substringBeforeLast(".")}.il"
+            val parentPath = file.toPath().parent.toAbsolutePath()
+
+            writeString(parentPath.resolve(fileName), content, Charsets.UTF_8)
         }
     }
 

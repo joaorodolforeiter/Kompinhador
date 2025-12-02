@@ -26,12 +26,12 @@ dependencies {
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
-    arguments = arguments + listOf("-visitor", "-no-listener")
+    arguments = arguments + listOf("-listener")
 }
 
 tasks.generateTestGrammarSource {
     maxHeapSize = "64m"
-    arguments = arguments + listOf("-visitor", "-no-listener")
+    arguments = arguments + listOf("-listener")
 }
 
 tasks.test {
