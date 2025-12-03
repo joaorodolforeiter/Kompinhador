@@ -8,16 +8,8 @@ import javax.swing.*
 import javax.swing.SwingUtilities.invokeLater
 
 fun main() {
-//    FlatLightLaf.setup()
-//    JFrame.setDefaultLookAndFeelDecorated(true)
+    FlatLightLaf.setup()
+    JFrame.setDefaultLookAndFeelDecorated(true)
 
-    print(Compiler().compile("""
-        begin 
-         int lado; 
-         read ("digite um valor para lado: ", lado);
-         print ("o valor digitado foi: ", lado); 
-        end
-    """.trimIndent()))
-
-    //invokeLater { CodeEditor() }
+    invokeLater { CodeEditor() }
 }
