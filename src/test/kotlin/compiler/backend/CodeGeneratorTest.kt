@@ -319,4 +319,372 @@ class CodeGeneratorTest {
         assertTrue(output.contains("Int:"))
         assertTrue(output.contains("2"))
     }
+
+    // ============================================
+    // TESTES DE OPERADORES RELACIONAIS
+    // ============================================
+
+    @Test
+    fun `deve testar operador igualdade com valores iguais`() {
+        val code = """
+            begin
+                if 5 == 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador igualdade com valores diferentes`() {
+        val code = """
+            begin
+                if 5 == 10
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador igualdade com variáveis iguais`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 10;
+                y = 10;
+                if x == y
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador igualdade com variáveis diferentes`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 10;
+                y = 20;
+                if x == y
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador igualdade com floats`() {
+        val code = """
+            begin
+                if 3.14 == 3.14
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador diferente com valores diferentes`() {
+        val code = """
+            begin
+                if 5 ~= 10
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador diferente com valores iguais`() {
+        val code = """
+            begin
+                if 5 ~= 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador diferente com variáveis`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 15;
+                y = 25;
+                if x ~= y
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador menor que com valor menor`() {
+        val code = """
+            begin
+                if 5 < 10
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador menor que com valor maior`() {
+        val code = """
+            begin
+                if 10 < 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador menor que com valores iguais`() {
+        val code = """
+            begin
+                if 5 < 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador menor que com variáveis`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 3;
+                y = 7;
+                if x < y
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador menor que com floats`() {
+        val code = """
+            begin
+                if 2.5 < 3.5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador maior que com valor maior`() {
+        val code = """
+            begin
+                if 10 > 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador maior que com valor menor`() {
+        val code = """
+            begin
+                if 5 > 10
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador maior que com valores iguais`() {
+        val code = """
+            begin
+                if 5 > 5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("false"))
+        assertFalse(output.contains("true"))
+    }
+
+    @Test
+    fun `deve testar operador maior que com variáveis`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 8;
+                y = 4;
+                if x > y
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador maior que com floats`() {
+        val code = """
+            begin
+                if 4.5 > 2.5
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador relacional com expressão aritmética`() {
+        val code = """
+            begin
+                if 10 + 5 > 12
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
+
+    @Test
+    fun `deve testar operador relacional com variáveis e expressões`() {
+        val code = """
+            begin
+                int x;
+                int y;
+                x = 10;
+                y = 5;
+                if x * 2 == y * 4
+                    print("true");
+                else
+                    print("false");
+                end
+            end
+        """.trimIndent()
+
+        val output = compileAndExecute(code)
+        assertTrue(output.contains("true"))
+        assertFalse(output.contains("false"))
+    }
 }
