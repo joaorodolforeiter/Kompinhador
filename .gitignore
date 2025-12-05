@@ -44,4 +44,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### ANTLR ###
 .antlr
+!**/src/main/gen/
