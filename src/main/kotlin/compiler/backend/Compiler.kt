@@ -7,7 +7,6 @@ import compiler.backend.listeners.ParserErrorListener
 import compiler.backend.listeners.ExprSemanticListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.BailErrorStrategy
 
 
 class Compiler {
@@ -29,7 +28,6 @@ class Compiler {
             addParseListener(listener)
             addErrorListener(ParserErrorListener)
             buildParseTree = true
-            errorHandler = BailErrorStrategy()
         }
 
         var a = parser.program()

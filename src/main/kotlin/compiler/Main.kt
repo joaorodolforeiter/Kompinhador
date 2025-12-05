@@ -7,7 +7,7 @@ import java.io.File
 private val code = """
 
 begin
-    if 1 print(2 + 3 * 4); end; 
+    print(1 + 2 * 3 / 2);
 end
 
 """.trimIndent()
