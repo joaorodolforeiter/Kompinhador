@@ -8,6 +8,7 @@ import compiler.backend.visitors.ExprSemanticListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
+
 class Compiler {
     fun compile(text: String): String {
         val stream = CharStreams.fromString(text)
@@ -26,9 +27,13 @@ class Compiler {
             removeErrorListeners()
             addParseListener(listener)
             addErrorListener(ParserErrorListener)
+            buildParseTree = true
         }
 
-        parser.program()
+        var a = parser.program()
+        println()
+
+        print(a.toStringTree(parser))
 
         return listener.getCode()
     }

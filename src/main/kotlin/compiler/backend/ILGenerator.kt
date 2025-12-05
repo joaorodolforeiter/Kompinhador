@@ -1,5 +1,7 @@
 package compiler.backend
 
+import compiler.common.SymbolType
+
 class ILGenerator {
     private val code = StringBuilder()
     private var labelCounter = 0
@@ -10,7 +12,7 @@ class ILGenerator {
         code.appendLine(".module program.exe")
         code.appendLine("")
         code.appendLine(".class public Program extends [mscorlib]System.Object {")
-        code.appendLine("  .method public static void main() cil managed {")
+        code.appendLine("  .method public static void Main() cil managed {")
         code.appendLine("    .entrypoint")
         code.appendLine("    .maxstack 100")
     }
@@ -113,7 +115,7 @@ class ILGenerator {
         emit("ceq")
     }
 
-    fun writeValue(type: String) {
+    fun writeValue(type: SymbolType) {
         emit("call void [mscorlib]System.Console::Write($type)")
     }
 
@@ -156,6 +158,11 @@ class ILGenerator {
 
     fun addComment(comment: String) {
         emit("// $comment")
+    }
+
+    // convertFloat64ToInt64
+    fun convertFloat64ToInt64() {
+        emit("conv.i8")
     }
 
     fun getCode(): String = code.toString()

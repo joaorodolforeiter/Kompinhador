@@ -17,8 +17,7 @@ class Editor : RSyntaxTextArea() {
         text = """
             begin 
              int lado; 
-             read ("digite um valor para lado: ", lado);
-             print ("o valor digitado foi: ", lado); 
+             lado <- 10 + 10;
             end
         """.trimIndent()
 
