@@ -4,7 +4,7 @@ import ExprLexer
 import ExprParser
 import compiler.backend.listeners.LexerErrorListener
 import compiler.backend.listeners.ParserErrorListener
-import compiler.backend.visitors.ExprSemanticListener
+import compiler.backend.listeners.ExprSemanticListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
