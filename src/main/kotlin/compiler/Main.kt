@@ -4,20 +4,26 @@ import compiler.backend.Compiler
 
 import java.io.File
 
+private val code = """
+
+begin
+    print(2 + 3 * 4); 
+end
+
+""".trimIndent()
+
 fun main() {
     //    FlatLightLaf.setup()
     //    JFrame.setDefaultLookAndFeelDecorated(true)
 
-    val ams = Compiler().compile(
-        """
-            begin
-            float a;
-            a = 10;
-            do print("Hello, World!"); a = a - 1; until a == 0;
-            end
-            """.trimIndent()
-    )
+    val ams = Compiler().compile(code)
 
+    extracted(ams)
+
+    //invokeLater { CodeEditor() }
+}
+
+private fun extracted(ams: String) {
     print(ams)
 
     // Write IL code to file
@@ -47,6 +53,4 @@ fun main() {
         println("Compilation failed:")
         println(ilasmOutput)
     }
-
-    //invokeLater { CodeEditor() }
 }

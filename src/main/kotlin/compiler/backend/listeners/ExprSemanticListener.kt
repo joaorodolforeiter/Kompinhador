@@ -33,7 +33,12 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #102: Escreve um valor na saída padrão
      */
     fun writeValue() {
-        val type = reg.typeStack.pop()
+        var type = reg.typeStack.pop()
+
+        if (type == SymbolType.INT) {
+            ilGen.convertInt64ToFloat64()
+            type = SymbolType.FLOAT
+        }
 
         ilGen.writeValue(type)
     }
@@ -217,7 +222,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
     }
 
     /**
-     * AÇÃO #111: Armazena operador relacional
+     * AÇÃO #111: Armazenar operador relacional
      */
     fun storeRelationalOperator(operator: String) {
         reg.relationalOperator = operator
@@ -302,7 +307,9 @@ class ExprSemanticListener : ExprParserBaseListener() {
             throw SemanticException("linha $line: variável '$id' já declarada.")
         }
 
-        ilGen.declareLocal(id, type.toString())
+        // No IL, int é representado como float64
+        val ilType = if (type == SymbolType.INT) "float64" else type.toString()
+        ilGen.declareLocal(id, ilType)
     }
 
     /**
@@ -409,16 +416,15 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #122: Executa atribuição (quando o valor da atribuição foi processado)
      */
     override fun exitAssignment_value(ctx: ExprParser.Assignment_valueContext) {
-        if (ctx in processedAssignments) {
-            return
-        }
+        if (ctx in processedAssignments) return
+
 
         processedAssignments.add(ctx)
         performAssigment(ctx.start.line)
     }
 
     /**
-     * AÇÃO #111: Armazena operador relacional reconhecido
+     * AÇÃO #111: Armazenar operador relacional reconhecido
      */
     override fun exitOperador_relacional(ctx: ExprParser.Operador_relacionalContext) {
         when {
@@ -480,13 +486,15 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #127: Inicio da cláusula ELSE - cria rótulo de saída e ajusta rótulos
      */
-    override fun enterElse_statement(ctx: ExprParser.Else_statementContext) {
-        if (ctx.PR_ELSE() == null) return
+    override fun enterCommands(ctx: ExprParser.CommandsContext) {
+        if (ctx.parent !is ExprParser.Else_statementContext) return
 
         val novoRotulo2 = ilGen.createLabel()
+
         ilGen.branch(novoRotulo2)
 
         val novoRotulo1 = reg.labelStack.pop()
+
         ilGen.emitLabel(novoRotulo1)
 
         reg.labelStack.push(novoRotulo2)
