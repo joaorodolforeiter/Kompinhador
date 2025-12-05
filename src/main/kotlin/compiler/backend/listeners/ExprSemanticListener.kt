@@ -455,32 +455,33 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #125: Início do comando de seleção (if) - valida expressão e cria rótulo de salto
      */
     override fun exitExpression(ctx: ExprParser.ExpressionContext) {
-
-        val parent = ctx.parent
-
-        if (parent is ExprParser.If_statementContext) {
-
-            val exprType = reg.typeStack.pop()
-            if (exprType != SymbolType.BOOL) {
-                throw SemanticException("linha ${ctx.start.line}: expressão incompatível em comando de seleção")
-            }
-
-            val novoRotulo1 = ilGen.createLabel()
-
-            ilGen.branchIfFalse(novoRotulo1)
-
-            reg.labelStack.push(novoRotulo1)
-        } else if (parent is ExprParser.Do_until_statementContext) {
-
-            val exprType = reg.typeStack.pop()
-            if (exprType != SymbolType.BOOL) {
-                throw SemanticException("linha ${ctx.start.line}: expressão incompatível em comando de repetição")
-            }
-
-
-            val rotuloDesempilhado = reg.labelStack.pop()
-            ilGen.branchIfFalse(rotuloDesempilhado)
+        when (ctx.parent) {
+            is ExprParser.If_statementContext -> ifExpression(ctx)
+            is ExprParser.Do_until_statementContext -> doWhileExpression(ctx)
         }
+    }
+
+    private fun ifExpression(ctx: ExprParser.ExpressionContext) {
+        val exprType = reg.typeStack.pop()
+        if (exprType != SymbolType.BOOL) {
+            throw SemanticException("linha ${ctx.start.line}: expressão incompatível em comando de seleção")
+        }
+
+        val novoRotulo1 = ilGen.createLabel()
+
+        ilGen.branchIfFalse(novoRotulo1)
+
+        reg.labelStack.push(novoRotulo1)
+    }
+
+    private fun doWhileExpression(ctx: ExprParser.ExpressionContext) {
+        val exprType = reg.typeStack.pop()
+        if (exprType != SymbolType.BOOL) {
+            throw SemanticException("linha ${ctx.start.line}: expressão incompatível em comando de repetição")
+        }
+
+        val rotuloDesempilhado = reg.labelStack.pop()
+        ilGen.branchIfFalse(rotuloDesempilhado)
     }
 
     /**
