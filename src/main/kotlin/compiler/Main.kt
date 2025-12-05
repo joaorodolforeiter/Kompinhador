@@ -11,7 +11,9 @@ fun main() {
     val ams = Compiler().compile(
         """
             begin
-                print(10.6 / -10.6);
+            float a;
+            a = 10;
+            do print("Hello, World!"); a = a - 1; until a == 0;
             end
             """.trimIndent()
     )
