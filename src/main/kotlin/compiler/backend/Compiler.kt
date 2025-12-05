@@ -26,9 +26,13 @@ class Compiler {
             removeErrorListeners()
             addParseListener(listener)
             addErrorListener(ParserErrorListener)
+            buildParseTree = true
         }
 
-        parser.program()
+        var a = parser.program()
+        println()
+
+        print(a.toStringTree(parser))
 
         return listener.getCode()
     }

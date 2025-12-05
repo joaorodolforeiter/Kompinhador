@@ -34,11 +34,45 @@ class ExprSemanticListener : ExprParserBaseListener() {
     fun writeValue() {
         val type = reg.typeStack.pop()
 
-        if (type == "int64") {
-            ilGen.convertInt64ToFloat64()
-        }
-
         ilGen.writeValue(type)
+    }
+
+    override fun exitFator(ctx: ExprParser.FatorContext) {
+        when {
+            ctx.CINT() != null -> loadIntegerConstant(ctx.CINT().text)
+            ctx.CFLOAT() != null -> loadFloatConstant(ctx.CFLOAT().text)
+            ctx.STRING() != null -> loadStringConstant(ctx.STRING().text)
+            ctx.MINUS() != null -> performUnaryNegation()
+            ctx.IDENTIFICADOR() != null -> {
+                //???
+            }
+        }
+    }
+
+    override fun exitAritmetica_(ctx: ExprParser.Aritmetica_Context) {
+        when {
+            ctx.PLUS() != null -> performAddition()
+            ctx.MINUS() != null -> performSubtraction()
+        }
+    }
+
+    override fun exitValor(ctx: ExprParser.ValorContext) {
+        when {
+            ctx.PR_TRUE() != null -> loadTrueConstant()
+            ctx.PR_FALSE() != null -> loadFalseConstant()
+            ctx.PR_NOT() != null -> performLogicalNot()
+        }
+    }
+
+    override fun exitExpression_(ctx: ExprParser.Expression_Context) {
+        when {
+            ctx.PR_AND() != null -> performLogicalAnd()
+            ctx.PR_OR() != null -> performLogicalOr()
+        }
+    }
+
+    override fun exitExpressions(ctx: ExprParser.ExpressionsContext) {
+        writeValue()
     }
 
     /**
@@ -68,16 +102,15 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #103: Carrega constante inteira
      */
     fun loadIntegerConstant(lexeme: String) {
-        reg.typeStack.push("int64")
+        reg.typeStack.push(SymbolType.INT)
         ilGen.loadIntegerConstant(lexeme)
-        ilGen.convertInt64ToFloat64()
     }
 
     /**
      * AÇÃO #104: Carrega constante float
      */
     fun loadFloatConstant(lexeme: String) {
-        reg.typeStack.push("float64")
+        reg.typeStack.push(SymbolType.FLOAT)
         ilGen.loadFloatConstant(lexeme)
     }
 
@@ -85,8 +118,15 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #105: Carrega constante string
      */
     fun loadStringConstant(lexeme: String) {
-        reg.typeStack.push("string")
+        reg.typeStack.push(SymbolType.STRING)
         ilGen.loadStringConstant(lexeme)
+    }
+
+    override fun exitTermo_(ctx: ExprParser.Termo_Context) {
+        when {
+            ctx.TIMES() != null -> performMultiplication()
+            ctx.DIV() != null -> performDivision()
+        }
     }
 
     /**
@@ -135,7 +175,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
         reg.typeStack.pop()
         reg.typeStack.pop()
 
-        reg.typeStack.push("float64")
+        reg.typeStack.push(SymbolType.FLOAT)
         ilGen.divide()
     }
 
@@ -160,7 +200,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
         reg.typeStack.pop()
         reg.typeStack.pop()
 
-        reg.typeStack.push("bool")
+        reg.typeStack.push(SymbolType.BOOL)
 
         when (reg.relationalOperator) {
             "==" -> ilGen.compareEqual()
@@ -177,7 +217,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
         reg.typeStack.pop()
         reg.typeStack.pop()
 
-        reg.typeStack.push("bool")
+        reg.typeStack.push(SymbolType.BOOL)
         ilGen.logicalAnd()
     }
 
@@ -188,7 +228,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
         reg.typeStack.pop()
         reg.typeStack.pop()
 
-        reg.typeStack.push("bool")
+        reg.typeStack.push(SymbolType.BOOL)
         ilGen.logicalOr()
     }
 
@@ -196,7 +236,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #115: Constante TRUE
      */
     fun loadTrueConstant() {
-        reg.typeStack.push("bool")
+        reg.typeStack.push(SymbolType.BOOL)
         ilGen.loadTrue()
     }
 
@@ -204,7 +244,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #116: Constante FALSE
      */
     fun loadFalseConstant() {
-        reg.typeStack.push("bool")
+        reg.typeStack.push(SymbolType.BOOL)
         ilGen.loadFalse()
     }
 
@@ -248,7 +288,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
     fun performAssigment(line: Int) {
         val exprType = reg.typeStack.pop()
 
-        if (exprType == "int64") {
+        if (exprType == SymbolType.INT) {
             ilGen.convertInt64ToFloat64()
         }
 
@@ -300,18 +340,18 @@ class ExprSemanticListener : ExprParserBaseListener() {
      */
     fun writePromptString(cteString: String) {
         ilGen.loadStringConstant(cteString)
-        ilGen.writeValue("string")
+        ilGen.writeValue(SymbolType.STRING)
     }
 
 
     /**
      * Determina o tipo resultante de uma operação aritmética
      */
-    private fun determineArithmeticResultType(type1: String, type2: String): String {
+    private fun determineArithmeticResultType(type1: SymbolType, type2: SymbolType): SymbolType {
         return when {
-            type1 == "int64" && type2 == "int64" -> "int64"
-            type1 == "float64" || type2 == "float64" -> "float64"
-            else -> "float64"
+            type1 == SymbolType.INT && type2 == SymbolType.INT -> SymbolType.INT
+            type1 == SymbolType.FLOAT || type2 == SymbolType.FLOAT -> SymbolType.FLOAT
+            else -> SymbolType.FLOAT
         }
     }
 
