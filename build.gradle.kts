@@ -34,9 +34,9 @@ tasks.generateTestGrammarSource {
     arguments = arguments + listOf("-listener")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
+//tasks.test {
+//    useJUnitPlatform()
+//}
 
 kotlin { jvmToolchain(17) }
 

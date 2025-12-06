@@ -35,13 +35,10 @@ class ExprSemanticListener : ExprParserBaseListener() {
      * AÇÃO #102: Escreve um valor na saída padrão
      */
     fun writeValue() {
-        var type = reg.typeStack.pop()
-
+        val type = reg.typeStack.pop()
         if (type == SymbolType.INT) {
-            ilGen.convertInt64ToFloat64()
-            type = SymbolType.FLOAT
+            ilGen.convertFloat64ToInt64()
         }
-
         ilGen.writeValue(type)
     }
 
@@ -58,12 +55,9 @@ class ExprSemanticListener : ExprParserBaseListener() {
                 val symbol = symbolTable.lookup(id)
                     ?: throw SemanticException("linha ${ctx.start.line}: variável '$id' não declarada.")
 
-
                 reg.typeStack.push(symbol.type)
 
-
                 ilGen.loadVariable(id)
-
 
                 if (symbol.type == SymbolType.INT) {
                     ilGen.convertInt64ToFloat64()
@@ -379,20 +373,20 @@ class ExprSemanticListener : ExprParserBaseListener() {
         reg.clearIdentifierList()
     }
 
-    /**
-     * AÇÃO #123: Comando READ
-     */
     fun performRead(id: String, text: String, line: Int) {
+        // AÇÃO #123: validação de tipo da variável
         val symbol = symbolTable.lookup(id)
         if (symbol == null) {
-            throw SemanticException("variável $id não declarada; linha $line")
+            throw SemanticException("linha $line: variável $id não declarada")
         }
         if (symbol.type == SymbolType.BOOL) {
-            throw SemanticException("logico inválido para comando de entrada; linha $line")
+            throw SemanticException("linha $line: logico inválido para comando de entrada")
         }
 
-        // Ação 124
+        // AÇÃO 123: Imprimir mensagem na saída padrão
         writePromptString(text)
+
+        // AÇÃO #123: leitura do valor na entrada padrão
         ilGen.readLine()
         when (symbol.type) {
             SymbolType.INT -> {
