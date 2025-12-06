@@ -2,11 +2,12 @@ package compiler.backend
 
 import ExprLexer
 import ExprParser
+import compiler.backend.listeners.ExprSemanticListener
 import compiler.backend.listeners.LexerErrorListener
 import compiler.backend.listeners.ParserErrorListener
-import compiler.backend.listeners.ExprSemanticListener
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.tree.ParseTreeWalker
 
 
 class Compiler {
@@ -21,20 +22,19 @@ class Compiler {
         val tokens = CommonTokenStream(lexer)
         tokens.fill()
 
-        val listener = ExprSemanticListener()
 
         val parser = ExprParser(tokens).apply {
             removeErrorListeners()
-            addParseListener(listener)
             addErrorListener(ParserErrorListener)
             buildParseTree = true
         }
 
-        var a = parser.program()
-        println()
+        val parseTree = parser.program()
 
-        print(a.toStringTree(parser))
+        val semanticListener = ExprSemanticListener()
 
-        return listener.getCode()
+        ParseTreeWalker.DEFAULT.walk(semanticListener, parseTree)
+
+        return semanticListener.getCode()
     }
 }

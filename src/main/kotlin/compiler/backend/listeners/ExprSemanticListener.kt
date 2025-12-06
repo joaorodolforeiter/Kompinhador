@@ -101,13 +101,6 @@ class ExprSemanticListener : ExprParserBaseListener() {
     }
 
     /**
-     * AÇÃO #102 (impressão individual de expressão)
-     */
-    override fun exitExpressions(ctx: ExprParser.ExpressionsContext) {
-        writeValue()
-    }
-
-    /**
      * AÇÃO #120: Armazenar tipo
      */
     override fun enterPrimitive(ctx: ExprParser.PrimitiveContext) {
@@ -458,6 +451,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
         when (ctx.parent) {
             is ExprParser.If_statementContext -> ifExpression(ctx)
             is ExprParser.Do_until_statementContext -> doWhileExpression(ctx)
+            is ExprParser.ExpressionsContext -> writeValue()
         }
     }
 
