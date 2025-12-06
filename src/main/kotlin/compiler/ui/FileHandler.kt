@@ -14,8 +14,7 @@ class FileHandler(
 ) {
     private val fileChooser = JFileChooser().apply { dialogTitle = "Selecione um arquivo" }
 
-    private var currentFile: File? = null
-    private var assemblyFile: File? = null
+    var currentFile: File? = null
 
     private var fileModificationDate: Long = 0
 
