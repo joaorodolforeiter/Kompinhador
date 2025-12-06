@@ -1,26 +1,42 @@
 package compiler
 
+import com.formdev.flatlaf.FlatLightLaf
 import compiler.backend.Compiler
+import compiler.ui.CodeEditor
 
 import java.io.File
+import javax.swing.JFrame
+import javax.swing.SwingUtilities.invokeLater
 
 private val code = """
-
 begin
-    print()
+    int a, b, c, d, temp;
+    a = 0;
+    b = 1;
+    c = 0;
+    
+    read("Informe a quantidade de termos a serem exibidos: ", d);
+    
+    print("Fibonacci sequence:");
+    do
+        print(c, " - ", a);
+        temp = a + b;
+        a = b;
+        b = temp;
+        c = c + 1;
+    until c == d;
 end
-
 """.trimIndent()
 
 fun main() {
-    //    FlatLightLaf.setup()
-    //    JFrame.setDefaultLookAndFeelDecorated(true)
+//        FlatLightLaf.setup()
+//        JFrame.setDefaultLookAndFeelDecorated(true)
 
     val ams = Compiler().compile(code)
 
     extracted(ams)
 
-    //invokeLater { CodeEditor() }
+//    invokeLater { CodeEditor() }
 }
 
 private fun extracted(ams: String) {

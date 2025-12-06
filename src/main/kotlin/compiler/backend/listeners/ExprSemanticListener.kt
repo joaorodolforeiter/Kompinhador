@@ -1,11 +1,13 @@
 package compiler.backend.listeners
 
+import ExprParser
 import ExprParserBaseListener
 import compiler.backend.ILGenerator
 import compiler.backend.SemanticRegisters
 import compiler.common.SymbolTable
 import compiler.common.SymbolType
 import compiler.exceptions.SemanticException
+import org.antlr.v4.runtime.tree.TerminalNodeImpl
 
 class ExprSemanticListener : ExprParserBaseListener() {
 
@@ -336,35 +338,27 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #123: Comando READ
      */
-    fun performRead(id: String, line: Int) {
+    fun performRead(id: String, text: String, line: Int) {
         val symbol = symbolTable.lookup(id)
-            ?: throw SemanticException("linha $line: variável '$id' não declarada.")
-
+        if (symbol == null) {
+            throw SemanticException("variável $id não declarada; linha $line")
+        }
         if (symbol.type == SymbolType.BOOL) {
-            throw SemanticException("linha $line: variável '$id' do tipo 'bool' não pode ser lida.")
+            throw SemanticException("logico inválido para comando de entrada; linha $line")
         }
 
+        // Ação 124
+        writePromptString(text)
         ilGen.readLine()
-
         when (symbol.type) {
-            SymbolType.INT -> ilGen.parseInt64()
+            SymbolType.INT -> {
+                ilGen.parseInt64()
+                ilGen.convertInt64ToFloat64()
+            }
             SymbolType.FLOAT -> ilGen.parseFloat64()
-            SymbolType.STRING -> { /* já está em string */
-            }
-
-            else -> { /* nada deve ocorrer */
-            }
+            else -> {}
         }
-
         ilGen.storeVariable(id)
-        symbolTable.markInitialized(id)
-    }
-
-    /**
-     * AÇÃO #124: String opcional no READ
-     */
-    override fun enterOpt_string(ctx: ExprParser.Opt_stringContext) {
-        writePromptString(ctx.start.text)
     }
 
     fun writePromptString(cteString: String) {
@@ -442,6 +436,29 @@ class ExprSemanticListener : ExprParserBaseListener() {
      */
     override fun exitPrint_statement(ctx: ExprParser.Print_statementContext) {
         writeNewLine()
+    }
+
+    override fun exitRead_statement(ctx: ExprParser.Read_statementContext?) {
+        if (ctx == null) {
+            return;
+        }
+
+        var hasRemaingVariablesToRead = true;
+        var input = (ctx.children[2] as ExprParser.Input_listContext);
+        while (hasRemaingVariablesToRead) {
+            val optionalStringContext = (input.children[0] as ExprParser.Opt_stringContext)
+            val text = (optionalStringContext.children[0] as TerminalNodeImpl).symbol.text
+            val id = (input.children[1] as TerminalNodeImpl).symbol.text
+
+            performRead(id, text, ctx.start.line)
+            val nextInput = (input.children[2] as ExprParser.Extra_input_identifiersContext)
+            if (nextInput.children == null) {
+                hasRemaingVariablesToRead = false;
+            } else {
+                input = (nextInput.children[1] as ExprParser.Input_listContext)
+            }
+        }
+
     }
 
     /**

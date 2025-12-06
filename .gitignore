@@ -47,3 +47,7 @@ bin/
 ### ANTLR ###
 .antlr
 !**/src/main/gen/
+
+### OUTPUT ###
+*.il
+*.exe
