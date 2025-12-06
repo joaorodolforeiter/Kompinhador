@@ -10,21 +10,7 @@ import javax.swing.SwingUtilities.invokeLater
 
 private val code = """
 begin
-    int a, b, c, d, temp;
-    a = 0;
-    b = 1;
-    c = 0;
-    
-    read("Informe a quantidade de termos a serem exibidos: ", d);
-    
-    print("Fibonacci sequence:");
-    do
-        print(c, " - ", a);
-        temp = a + b;
-        a = b;
-        b = temp;
-        c = c + 1;
-    until c == d;
+    print((true) and (1));
 end
 """.trimIndent()
 

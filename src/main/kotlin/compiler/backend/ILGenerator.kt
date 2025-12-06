@@ -102,11 +102,11 @@ class ILGenerator {
         emit("cgt")
     }
 
-    fun logicalAnd() {
+    fun logicalAnd(line: Int) {
         emit("and")
     }
 
-    fun logicalOr() {
+    fun logicalOr(line: Int) {
         emit("or")
     }
 

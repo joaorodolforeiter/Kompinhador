@@ -50,7 +50,8 @@ class ExprSemanticListener : ExprParserBaseListener() {
             ctx.CINT() != null -> loadIntegerConstant(ctx.CINT().text)
             ctx.CFLOAT() != null -> loadFloatConstant(ctx.CFLOAT().text)
             ctx.STRING() != null -> loadStringConstant(ctx.STRING().text)
-            ctx.MINUS() != null -> performUnaryNegation()
+            ctx.MINUS() != null -> performUnaryNegation(ctx.start.line)
+            ctx.PLUS() != null -> performUnaryPlus(ctx.start.line)
             ctx.IDENTIFICADOR() != null -> {
 
                 val id = ctx.IDENTIFICADOR().text
@@ -71,13 +72,21 @@ class ExprSemanticListener : ExprParserBaseListener() {
         }
     }
 
+    private fun performUnaryPlus(line: Int) {
+        val type = reg.typeStack.pop()
+        if (type != SymbolType.INT && type != SymbolType.FLOAT) {
+            throw SemanticException("linha ${line}: operador unário '+' aplicado a tipo inválido.")
+        }
+        reg.typeStack.push(type)
+    }
+
     /**
      * AÇÃO #106/#107: Detecta operador de adição/subtração na lista de aritmética
      */
     override fun exitAritmetica_(ctx: ExprParser.Aritmetica_Context) {
         when {
-            ctx.PLUS() != null -> performAddition()
-            ctx.MINUS() != null -> performSubtraction()
+            ctx.PLUS() != null -> performAddition(ctx.start.line)
+            ctx.MINUS() != null -> performSubtraction(ctx.start.line)
         }
     }
 
@@ -88,7 +97,17 @@ class ExprSemanticListener : ExprParserBaseListener() {
         when {
             ctx.PR_TRUE() != null -> loadTrueConstant()
             ctx.PR_FALSE() != null -> loadFalseConstant()
-            ctx.PR_NOT() != null -> performLogicalNot()
+            ctx.PR_NOT() != null -> {
+                val type = reg.typeStack.pop()
+
+                if (type != SymbolType.BOOL) {
+                    throw SemanticException("linha ${ctx.start.line}: operador lógico NOT aplicado a tipo inválido.")
+                }
+
+                reg.typeStack.push(type)
+
+                performLogicalNot()
+            }
         }
     }
 
@@ -97,9 +116,30 @@ class ExprSemanticListener : ExprParserBaseListener() {
      */
     override fun exitExpression_(ctx: ExprParser.Expression_Context) {
         when {
-            ctx.PR_AND() != null -> performLogicalAnd()
-            ctx.PR_OR() != null -> performLogicalOr()
+            ctx.PR_AND() != null -> logicalAnd(ctx)
+            ctx.PR_OR() != null -> logicalOr(ctx)
         }
+    }
+
+    private fun logicalAnd(ctx: ExprParser.Expression_Context) {
+        val type1 = reg.typeStack.pop()
+        val type2 = reg.typeStack.pop()
+
+        if (type1 != SymbolType.BOOL || type2 != SymbolType.BOOL) {
+            throw SemanticException("linha ${ctx.start.line}: tipos incompatíveis para operação lógica.")
+        }
+
+        ilGen.logicalAnd(ctx.start.line)
+    }
+
+    private fun logicalOr(ctx: ExprParser.Expression_Context) {
+        val type1 = reg.typeStack.pop()
+        val type2 = reg.typeStack.pop()
+
+        if (type1 != SymbolType.BOOL || type2 != SymbolType.BOOL) {
+            throw SemanticException("linha ${ctx.start.line}: tipos incompatíveis para operação lógica.")
+        }
+        ilGen.logicalOr(ctx.start.line)
     }
 
     /**
@@ -154,19 +194,19 @@ class ExprSemanticListener : ExprParserBaseListener() {
      */
     override fun exitTermo_(ctx: ExprParser.Termo_Context) {
         when {
-            ctx.TIMES() != null -> performMultiplication()
-            ctx.DIV() != null -> performDivision()
+            ctx.TIMES() != null -> performMultiplication(ctx.start.line)
+            ctx.DIV() != null -> performDivision(ctx.start.line)
         }
     }
 
     /**
      * AÇÃO #106: Operador binário de adição
      */
-    fun performAddition() {
+    fun performAddition(line: Int) {
         val type1 = reg.typeStack.pop()
         val type2 = reg.typeStack.pop()
 
-        val resultType = determineArithmeticResultType(type1, type2)
+        val resultType = determineArithmeticResultType(type1, type2, line)
 
         reg.typeStack.push(resultType)
         ilGen.add()
@@ -175,11 +215,11 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #107: Operador binário de subtração
      */
-    fun performSubtraction() {
+    fun performSubtraction(line: Int) {
         val type1 = reg.typeStack.pop()
         val type2 = reg.typeStack.pop()
 
-        val resultType = determineArithmeticResultType(type1, type2)
+        val resultType = determineArithmeticResultType(type1, type2, line)
 
         reg.typeStack.push(resultType)
         ilGen.subtract()
@@ -188,11 +228,11 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #108: Operador binário de multiplicação
      */
-    fun performMultiplication() {
+    fun performMultiplication(line: Int) {
         val type1 = reg.typeStack.pop()
         val type2 = reg.typeStack.pop()
 
-        val resultType = determineArithmeticResultType(type1, type2)
+        val resultType = determineArithmeticResultType(type1, type2, line)
 
         reg.typeStack.push(resultType)
         ilGen.multiply()
@@ -201,9 +241,13 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #109: Operador binário de divisão
      */
-    fun performDivision() {
-        reg.typeStack.pop()
-        reg.typeStack.pop()
+    fun performDivision(line: Int) {
+        val type1 = reg.typeStack.pop()
+        val type2 = reg.typeStack.pop()
+
+        if (type1 in listOf(SymbolType.INT, SymbolType.FLOAT) && type2 in listOf(SymbolType.INT, SymbolType.FLOAT)) {
+            throw SemanticException("linha $line: tipos incompatíveis para operação de divisão.")
+        }
 
         reg.typeStack.push(SymbolType.FLOAT)
         ilGen.divide()
@@ -212,7 +256,13 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #110: Operador unário de negação
      */
-    fun performUnaryNegation() {
+    fun performUnaryNegation(line: Int) {
+        type = reg.typeStack.pop()
+        
+        if (type != SymbolType.INT && type != SymbolType.FLOAT) {
+            throw SemanticException("linha $line: operador unário '-' aplicado a tipo inválido.")
+        }
+        
         ilGen.negate()
     }
 
@@ -226,40 +276,34 @@ class ExprSemanticListener : ExprParserBaseListener() {
     /**
      * AÇÃO #112: Operação relacional
      */
-    fun performRelationalOperation() {
-        reg.typeStack.pop()
-        reg.typeStack.pop()
+    fun performRelationalOperation(line: Int) {
+        val type1 = reg.typeStack.pop()
+        val type2 = reg.typeStack.pop()
+
+        if ((type1 !in listOf(SymbolType.INT, SymbolType.FLOAT, SymbolType.STRING)) ||
+            (type2 !in listOf(SymbolType.INT, SymbolType.FLOAT, SymbolType.STRING))
+        ) {
+            throw SemanticException("linha $line: tipos incompatíveis para operação relacional.")
+        }
+
+        if (reg.relationalOperator in listOf("<", ">")) {
+            if (type1 == SymbolType.STRING || type2 == SymbolType.STRING) {
+                throw SemanticException("linha $line: tipos incompatíveis para operação relacional.")
+            }
+        }
+
+        if (SymbolType.STRING in listOf(type1, type2) && type1 != type2) {
+            throw SemanticException("linha $line: tipos incompatíveis para operação relacional.")
+        }
 
         reg.typeStack.push(SymbolType.BOOL)
 
         when (reg.relationalOperator) {
             "==" -> ilGen.compareEqual()
-            "!=" -> ilGen.compareNotEqual()
+            "~=" -> ilGen.compareNotEqual()
             "<" -> ilGen.compareLessThan()
             ">" -> ilGen.compareGreaterThan()
         }
-    }
-
-    /**
-     * AÇÃO #113: Operador lógico AND
-     */
-    fun performLogicalAnd() {
-        reg.typeStack.pop()
-        reg.typeStack.pop()
-
-        reg.typeStack.push(SymbolType.BOOL)
-        ilGen.logicalAnd()
-    }
-
-    /**
-     * AÇÃO #114: Operador lógico OR
-     */
-    fun performLogicalOr() {
-        reg.typeStack.pop()
-        reg.typeStack.pop()
-
-        reg.typeStack.push(SymbolType.BOOL)
-        ilGen.logicalOr()
     }
 
     /**
@@ -366,11 +410,11 @@ class ExprSemanticListener : ExprParserBaseListener() {
         ilGen.writeValue(SymbolType.STRING)
     }
 
-    private fun determineArithmeticResultType(type1: SymbolType, type2: SymbolType): SymbolType {
+    private fun determineArithmeticResultType(type1: SymbolType, type2: SymbolType, line: Int): SymbolType {
         return when {
             type1 == SymbolType.INT && type2 == SymbolType.INT -> SymbolType.INT
             type1 == SymbolType.FLOAT || type2 == SymbolType.FLOAT -> SymbolType.FLOAT
-            else -> SymbolType.FLOAT
+            else -> throw SemanticException("linha $line: tipos incompatíveis para operação aritmética.")
         }
     }
 
@@ -416,7 +460,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
     override fun exitOperador_relacional(ctx: ExprParser.Operador_relacionalContext) {
         when {
             ctx.EQEQ() != null -> storeRelationalOperator("==")
-            ctx.NEQ() != null -> storeRelationalOperator("!=")
+            ctx.NEQ() != null -> storeRelationalOperator("~=")
             ctx.LT() != null -> storeRelationalOperator("<")
             ctx.GT() != null -> storeRelationalOperator(">")
         }
@@ -427,7 +471,7 @@ class ExprSemanticListener : ExprParserBaseListener() {
      */
     override fun exitRelacional_(ctx: ExprParser.Relacional_Context) {
         if (ctx.operador_relacional() != null) {
-            performRelationalOperation()
+            performRelationalOperation(ctx.start.line)
         }
     }
 
